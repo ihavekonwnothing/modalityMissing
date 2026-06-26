@@ -1,1 +1,1 @@
-#### code will be available while accepting
+#### code will be available while accepted
