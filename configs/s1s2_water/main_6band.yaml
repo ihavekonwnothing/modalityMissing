@@ -1,0 +1,51 @@
+dataset:
+  name: s1s2_water
+  root_env: S1S2_WATER_ROOT
+  input_bands:
+    sar: [VV, VH]
+    optical: [Blue, Green, Red, NIR]
+  use_slope: false
+  patch_size: 256
+  ignore_invalid_pixels: true
+  stats_samples_per_scene: 2
+  patches_per_scene_per_epoch: 16
+
+training:
+  epochs: 100
+  batch_size: 16
+  optimizer: AdamW
+  lr: 0.001
+  weight_decay: 0.01
+  early_stopping_patience: 10
+  seed: 4
+  deterministic: true
+  num_workers: 0
+
+robust_fusion:
+  p_optical_partial_missing: 0.4
+  p_optical_full_missing: 0.2
+  mask_ratios: [0.25, 0.50, 0.75]
+
+metrics:
+  - IoU
+  - F1
+  - Precision
+  - Recall
+
+models:
+  - s1_only_unet
+  - s2_only_unet
+  - early_fusion_unet
+  - late_fusion_unet
+  - proposed_robust_fusion_unet
+
+degradation_test:
+  enabled: true
+  degradation_types:
+    - random_block_mask
+    - cloud_like_mask
+    - full_optical_missing
+  mask_ratios: [0.0, 0.25, 0.50, 0.75, 1.0]
+
+output_dir: outputs/s1s2_water/6band_main
+model_base_channels: 16

@@ -1,0 +1,28 @@
+dataset:
+  name: sen1floods11_6band
+  root: transfer_dataset/Sen1Floods11_6band
+  use_all_446: true
+  bands: [VV, VH, Blue, Green, Red, NIR]
+
+model:
+  name: mask_guided_late_fusion_unet
+  checkpoint: outputs/s1s2_water/proposed/mask_guided_late_fusion_unet_ddp/checkpoints/best.ckpt
+
+normalization:
+  stats_path: data/s1s2_water_patch_cache_512/stats.json
+  use_source_train_stats: true
+
+evaluation:
+  batch_size: 4
+  num_workers: 4
+  threshold: 0.5
+  missing_ratios: [0, 25, 50, 75, 100]
+  mask_types: [block, cloud]
+  use_valid_mask: true
+  save_predictions: true
+  save_preview: true
+  preview_limit_per_condition: 20
+  seed: 4
+
+output:
+  dir: outputs/zero_shot_sen1floods11/proposed

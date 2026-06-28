@@ -1,0 +1,86 @@
+model:
+  name: mask_aware_cross_attention_fusion_unet
+  architecture: mask_aware_cross_attention_fusion_unet
+  encoder: custom_lightweight
+  encoder_weights: null
+  sar_in_channels: 2
+  optical_in_channels: 4
+  opt_mask_channels: 1
+  num_classes: 1
+  hidden_dim: 128
+  num_heads: 4
+  window_size: 8
+  lambda_sar: 0.3
+  inference_mode: adaptive_fallback
+  use_cross_attention_scales: ["1/8", "1/16", "bottleneck"]
+  input_bands:
+    sar: [VV, VH]
+    optical: [Blue, Green, Red, NIR]
+
+output_dir: outputs/s1s2_water/proposed/mask_aware_cross_attention_fusion_unet_ddp
+
+dataset:
+  name: s1s2_water
+  root_env: S1S2_WATER_ROOT
+  patch_size: 512
+  use_sar: true
+  use_optical: true
+  use_slope: false
+  ignore_invalid_pixels: true
+  stats_samples_per_scene: 2
+  train_sampling: tiles
+  train_stride: null
+  eval_stride: null
+  patches_per_scene_per_epoch: 16
+  exclude_scenes: [31]
+  cache_dir: data/s1s2_water_patch_cache_512
+
+training:
+  epochs: 100
+  batch_size: 8
+  optimizer: AdamW
+  lr: 0.001
+  weight_decay: 0.01
+  early_stopping:
+    enabled: true
+    monitor: val_IoU
+    patience: 20
+    min_epochs: 30
+    min_delta: 0.0005
+  lr_scheduler:
+    type: reduce_on_plateau
+    factor: 0.5
+    patience: 8
+    threshold: 0.001
+    min_lr: 0.000001
+  seed: 4
+  deterministic: true
+  num_workers: 16
+  resume: true
+  amp:
+    enabled: true
+    dtype: bfloat16
+  missing_training: true
+  clean_prob: 0.25
+  partial_missing_prob: 0.45
+  full_missing_prob: 0.30
+  missing_ratios: [0.25, 0.50, 0.75]
+  mask_types: [block, cloud]
+
+robust_fusion:
+  enabled: true
+  p_clean: 0.25
+  p_optical_partial_missing: 0.45
+  p_optical_full_missing: 0.30
+  mask_ratios: [0.25, 0.50, 0.75]
+  mask_types: [random_block, cloud_like]
+
+loss:
+  bce_pos_weight: auto
+  dice: true
+
+metrics:
+  - IoU
+  - F1
+  - Precision
+  - Recall

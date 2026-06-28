@@ -1,0 +1,11 @@
+numpy
+torch
+torchvision
+tqdm
+PyYAML
+rasterio
+Pillow
+matplotlib
+segmentation-models-pytorch
+timm
+thop
