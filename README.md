@@ -1,4 +1,4 @@
-# Modality Missing SAR-Optical Water Segmentation
+# Robust SAR–Optical Surface-Water Segmentation under Missing Optical Observations
 
 This repository currently releases the core model implementation for our SAR-optical water segmentation work under missing optical modality.
 
